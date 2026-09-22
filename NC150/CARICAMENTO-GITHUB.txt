@@ -1,0 +1,28 @@
+NINE CROWNS v1.2.4 - CARICAMENTO CORRETTO
+
+NELLA PAGINA PRINCIPALE DEL REPOSITORY DEVI VEDERE:
+.github/
+src/
+build.gradle
+gradle.properties
+settings.gradle
+README.md
+
+NON DEVI VEDERE DIRETTAMENTE NELLA ROOT:
+NineCrowns.java
+ModItems.java
+Recipes.java
+emperor_crown.json
+empty_crown.json
+
+Se questi file Java/JSON compaiono nella root, la struttura e stata appiattita e la build deve essere rifatta.
+
+Metodo browser GitHub:
+1. Estrai questo ZIP sul PC.
+2. Apri Add file > Upload files.
+3. Trascina LE CARTELLE .github e src (come cartelle), poi i file build.gradle, gradle.properties, settings.gradle, README.md e CARICAMENTO-GITHUB.txt.
+4. Commit changes.
+5. Controlla la root come sopra.
+6. Actions > Build NineCrowns > Run workflow.
+7. Un tick verde significa che il JAR e stato compilato e verificato internamente.
+8. Scarica l'Artifact NineCrowns-26.1-v1.2.4-VERIFIED.

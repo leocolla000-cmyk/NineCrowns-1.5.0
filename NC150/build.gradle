@@ -1,0 +1,93 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version '1.17.21'
+}
+
+version = '1.5.0'
+group = 'it.lia.ninecrowns'
+
+base {
+    archivesName = 'ninecrowns-26.1'
+}
+
+repositories {
+    maven { url = 'https://maven.fabricmc.net/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'com.mojang:minecraft:26.1'
+    implementation 'net.fabricmc:fabric-loader:0.19.5'
+    implementation 'net.fabricmc.fabric-api:fabric-api:0.145.1+26.1'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.register('verifyProjectLayout') {
+    doLast {
+        def required = [
+            file('src/main/java/it/lia/ninecrowns/NineCrowns.java'),
+            file('src/main/java/it/lia/ninecrowns/ModItems.java'),
+            file('src/main/resources/fabric.mod.json'),
+            file('src/main/resources/ninecrowns.mixins.json')
+        ]
+        def missing = required.findAll { !it.isFile() }
+        if (!missing.isEmpty()) {
+            throw new GradleException('PROJECT STRUCTURE ERROR. Missing: ' + missing.join(', ') + '. Upload the folders with their directory structure intact.')
+        }
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('verifyProjectLayout')
+}
+
+tasks.register('verifyModJar') {
+    dependsOn tasks.named('jar')
+    doLast {
+        def jarFile = tasks.named('jar').get().archiveFile.get().asFile
+        if (!jarFile.isFile() || jarFile.length() < 5000) {
+            throw new GradleException('Generated JAR is missing or suspiciously small: ' + jarFile)
+        }
+        def zip = new java.util.zip.ZipFile(jarFile)
+        try {
+            def requiredEntries = [
+                'fabric.mod.json',
+                'ninecrowns.mixins.json',
+                'it/lia/ninecrowns/NineCrowns.class',
+                'it/lia/ninecrowns/ModItems.class',
+                'it/lia/ninecrowns/Recipes.class',
+                'it/lia/ninecrowns/CrownEffects.class'
+            ]
+            def missing = requiredEntries.findAll { zip.getEntry(it) == null }
+            if (!missing.isEmpty()) {
+                throw new GradleException('INVALID MOD JAR. Missing entries: ' + missing.join(', '))
+            }
+            def classCount = zip.entries().findAll { !it.directory && it.name.endsWith('.class') }.size()
+            if (classCount < 10) {
+                throw new GradleException('INVALID MOD JAR. Only ' + classCount + ' class files found.')
+            }
+        } finally {
+            zip.close()
+        }
+        println 'Nine Crowns JAR verified: ' + jarFile + ' (' + jarFile.length() + ' bytes)'
+    }
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('verifyModJar')
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "ninecrowns",
+  "version": "${version}",
+  "name": "Nine Crowns",
+  "description": "Survival PvP per nove giocatori: teste, armi OP e Corona dell'Imperatore.",
+  "authors": ["Lia"],
+  "environment": "*",
+  "entrypoints": { "main": ["it.lia.ninecrowns.NineCrowns"] },
+  "mixins": ["ninecrowns.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "26.1",
+    "java": ">=25",
+    "fabric-api": ">=0.145.1"
+  }
+}
